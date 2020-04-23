@@ -1,10 +1,14 @@
 FROM php:7.2-alpine
 MAINTAINER Imre Szeness <imre@prstart.co.uk>
 
+ARG DOCKER_USER_UID=false
+ARG DOCKER_USER_GID=false
+
 # Install dev dependencies
 RUN apk add --no-cache --virtual .build-deps \
     $PHPIZE_DEPS \
     curl-dev \
+    icu-dev \
     imagemagick-dev \
     libtool \
     libxml2-dev \
@@ -32,7 +36,9 @@ RUN apk add --no-cache \
     openssh-client \
     postgresql-libs \
     rsync \
-    zlib-dev
+    zlib-dev \
+    icu-libs \
+    libintl
 
 # Install PECL and PEAR extensions
 RUN pecl install \
@@ -46,7 +52,8 @@ RUN docker-php-ext-enable \
 
 # Configure php extensions
 RUN docker-php-ext-configure gd --with-freetype-dir=/usr/include/ --with-jpeg-dir=/usr/include/ \
-    && docker-php-ext-configure zip --with-libzip
+    && docker-php-ext-configure zip --with-libzip \
+    && docker-php-ext-configure intl
 
 # Install php extensions
 RUN docker-php-ext-install \
@@ -64,7 +71,8 @@ RUN docker-php-ext-install \
     pcntl \
     tokenizer \
     xml \
-    zip
+    zip \
+    intl
 
 # Install composer
 ENV COMPOSER_HOME /composer
