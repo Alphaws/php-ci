@@ -1,6 +1,6 @@
 # php-ci
 
-Docker image for PHP applications 
+Docker images for PHP applications 
 
 - Laravel
 - Magento
