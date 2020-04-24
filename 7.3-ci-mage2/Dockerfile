@@ -9,6 +9,7 @@ RUN apk add --no-cache --virtual .build-deps \
     imagemagick-dev \
     libtool \
     libxml2-dev \
+    libxslt-dev \
     postgresql-dev \
     sqlite-dev
 
@@ -21,22 +22,23 @@ RUN apk add --no-cache \
     g++ \
     gcc \
     git \
+    icu-libs \
     imagemagick \
     libc-dev \
+    libintl \
     libjpeg-turbo-dev \
     libpng-dev \
+    libxslt \
     libzip-dev \
     make \
     mysql-client \
     nodejs \
     nodejs-npm \
-    yarn \
     openssh-client \
     postgresql-libs \
     rsync \
-    zlib-dev \
-    icu-libs \
-    libintl
+    yarn \
+    zlib-dev
 
 # Install PECL and PEAR extensions
 RUN pecl install \
