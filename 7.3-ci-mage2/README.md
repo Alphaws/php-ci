@@ -19,6 +19,7 @@
 - [x] soap
 - [x] sockets
 - [x] xml
+- [x] xsl
 - [x] zip
 
 ## Others

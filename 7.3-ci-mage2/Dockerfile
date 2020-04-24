@@ -71,6 +71,7 @@ RUN docker-php-ext-install \
     soap \
     tokenizer \
     xml \
+    xsl \
     zip
 
 # Install composer
