@@ -1,0 +1,5 @@
+#!/bin/bash
+
+[ -z "$1" ] && echo "Please specify project name (ex. magento2)" && exit
+
+# check folder is exists

@@ -1,0 +1,17 @@
+#!/bin/bash -e
+
+[ -z "$1" ] && echo "Please specify project name (ex. laravel1) and existing repository (default: new)" && exit
+
+
+
+bin/composer global require laravel/installer
+
+${COMPOSER_HOME}/bin/laravel new $1 --auth && \
+  cd $1 && \
+  composer require laravel/ui
+
+
+##    COMPOSER_HOME:
+## macOS: $HOME/.composer/vendor/bin
+## Windows: %USERPROFILE%\AppData\Roaming\Composer\vendor\bin
+## GNU / Linux Distributions: $HOME/.config/composer/vendor/bin or $HOME/.composer/vendor/bin

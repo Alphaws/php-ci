@@ -1,0 +1,51 @@
+#!/bin/bash -e
+#
+# phpde - build a php project skeleton with docker
+#
+# Copyright (C) 2020 by Imre Szeness.
+#
+
+php="7.3"
+db="mariadb"
+version="latest"
+repository=""
+
+
+usage()
+{
+  echo "Usage: $0 [OPTIONS] name
+  OPTIONS:
+    --help
+    --php=7.3
+    --db=mysql | mariadb* | pgsql
+    --db-root=root
+    --db-user=root
+    --db-password=root
+    --version=latest
+    --type=laravel* | magento1 |magento2 | cakephp"
+  exit 1
+}
+
+version="Php Docker Environment (phpde) v0.1"
+
+[ -z "$1" ] && echo "Please specify project path"; echo "$usage" && exit
+
+while :; do
+  case $1 in
+  --help)
+      usage
+  ;;
+  --version)
+     version
+   ;;
+  esac
+done
+
+if [ $# -eq 0 ]; then
+    echo "AAAAA"
+    usage
+fi
+
+# check path
+
+exec ls -al $path
