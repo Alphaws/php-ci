@@ -13,6 +13,5 @@ RUN docker-php-source extract \
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 RUN chmod +x /usr/local/bin/composer
 ENV PATH $PATH:/root/composer/vendor/bin
-RUN mkdir /var/www/
 WORKDIR /var/www
 VOLUME /var/www
