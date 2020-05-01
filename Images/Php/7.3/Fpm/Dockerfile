@@ -1,19 +1,19 @@
 FROM php:7.3-fpm-alpine
 MAINTAINER Imre Szeness <imre@prstart.co.uk>
-
+# Build options
 ARG DOCKER_USER_UID=false
 ARG DOCKER_USER_GID=false
 ARG DOCKER_PHP_ENABLE_IMAGICK
 ARG DOCKER_PHP_ENABLE_XDEBUG
-
+# Info
 RUN echo -n "With imagick support:       " ; if [[ "${DOCKER_PHP_ENABLE_IMAGICK}" = "on" ]] ;      then echo "Yes"; else echo "No" ; fi && \
     if [ -z ${DOCKER_USER_UID+x} ]; then echo "DOCKER_USER_UID is unset"; DOCKER_USER_UID=1000; else echo "DOCKER_USER_UID is set to '$DOCKER_USER_UID'"; fi && \
     if [ -z ${DOCKER_USER_GID+x} ]; then echo "DOCKER_USER_GID is unset"; DOCKER_USER_GID=1000; else echo "DOCKER_USER_GID is set to '$DOCKER_USER_GID'"; fi
-
+# Composer
 ENV COMPOSER_HOME /composer
 ENV PATH ./vendor/bin:/composer/vendor/bin:$PATH
 ENV COMPOSER_ALLOW_SUPERUSER 1
-
+# Install dependencies
 RUN apk add --update --no-cache --virtual .build-deps \
     $PHPIZE_DEPS \
     icu-libs \
@@ -24,10 +24,16 @@ RUN apk add --update --no-cache --virtual .build-deps \
     libtool \
     libxml2-dev \
     postgresql-dev \
-    sqlite-dev
-
+    sqlite-dev \
+    git \
+    patch
+# Install build dependencies
 RUN apk add --update --no-cache --virtual .docker-php-global-dependancies \
+    freetype-dev \
+    libjpeg-turbo-dev \
+    libpng-dev \
     curl \
+    gettext-dev \
     git \
     imagemagick \
     mysql-client \
@@ -38,14 +44,28 @@ RUN apk add --update --no-cache --virtual .docker-php-global-dependancies \
     libzip-dev \
     git \
     patch
-
+# PHP extensions
+RUN docker-php-ext-install \
+    bcmath \
+    curl \
+    gd \
+    iconv \
+    intl \
+    mbstring \
+    pcntl \
+    pdo \
+    pdo_mysql \
+    pdo_pgsql \
+    pdo_sqlite \
+    tokenizer \
+    xml \
+    zip
 # Enable imagick
 RUN if [ "${DOCKER_PHP_ENABLE_IMAGICK}" != "off" ]; then \
       # Dependancy for imagick \
       apk add --update --no-cache \
           imagemagick \
           imagemagick-libs && \
-
       # Build dependancy for imagick \
       apk add --update --no-cache --virtual .docker-php-imagick-dependancies \
           imagemagick-dev && \
@@ -56,7 +76,6 @@ RUN if [ "${DOCKER_PHP_ENABLE_IMAGICK}" != "off" ]; then \
     else \
       echo "Skip imagick support"; \
     fi
-
 # Enable Xdebug
 RUN if [ "${DOCKER_PHP_ENABLE_XDEBUG}" != "off" ]; then \
       # Build dependancy for XDebug \
@@ -75,34 +94,21 @@ RUN if [ "${DOCKER_PHP_ENABLE_XDEBUG}" != "off" ]; then \
     else \
       echo "Skip xdebug support"; \
     fi
-
-RUN docker-php-ext-install \
-    bcmath \
-    curl \
-    iconv \
-    mbstring \
-    pdo \
-    pdo_mysql \
-    pdo_pgsql \
-    pdo_sqlite \
-    pcntl \
-    tokenizer \
-    xml \
-    zip \
-    intl \
-  && curl -s https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin/ --filename=composer \
-  && composer global require "squizlabs/php_codesniffer=*" \
-  && apk del .docker-php-global-dependancies \
+# Composer
+RUN curl -s https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin/ --filename=composer \
+  && composer global require "squizlabs/php_codesniffer=*"
+# Clean
+RUN apk del .docker-php-global-dependancies \
   && rm -rf /var/cache/apk/* \
   && docker-php-source delete
-
+# set user
 RUN if [ "${DOCKER_USER_GID}" != "false" ] && [ "${DOCKER_USER_UID}" != "false" ]; then \
       addgroup -g ${DOCKER_USER_GID} php-cli && \
       adduser -D -u ${DOCKER_USER_UID} -G php-cli php-cli; \
     else \
       echo "No user for php-cli"; \
     fi
-
+# other
 WORKDIR /var/www/html
 VOLUME /var/www
 EXPOSE 9000
