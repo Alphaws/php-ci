@@ -5,8 +5,12 @@ ARG DOCKER_USER_UID=false
 ARG DOCKER_USER_GID=false
 ARG DOCKER_PHP_ENABLE_IMAGICK
 ARG DOCKER_PHP_ENABLE_XDEBUG
+ARG DOCKER_PHP_ENABLE_REDIS
 # Info
-RUN echo -n "With imagick support:       " ; if [[ "${DOCKER_PHP_ENABLE_IMAGICK}" = "on" ]] ;      then echo "Yes"; else echo "No" ; fi && \
+RUN echo -n "Php Docker image:" && \
+    echo -n "With xdebug support:        " ; if [[ "${DOCKER_PHP_ENABLE_XDEBUG}" = "on" ]] ;      then echo "Yes"; else echo "No" ; fi && \
+    echo -n "With imagick support:       " ; if [[ "${DOCKER_PHP_ENABLE_IMAGICK}" = "on" ]] ;      then echo "Yes"; else echo "No" ; fi && \
+    echo -n "With redis support:         " ; if [[ "${DOCKER_PHP_ENABLE_REDIS}" = "on" ]] ;    then echo "Yes"; else echo "No" ; fi && \
     if [ -z ${DOCKER_USER_UID+x} ]; then echo "DOCKER_USER_UID is unset"; DOCKER_USER_UID=1000; else echo "DOCKER_USER_UID is set to '$DOCKER_USER_UID'"; fi && \
     if [ -z ${DOCKER_USER_GID+x} ]; then echo "DOCKER_USER_GID is unset"; DOCKER_USER_GID=1000; else echo "DOCKER_USER_GID is set to '$DOCKER_USER_GID'"; fi
 # Composer
@@ -44,7 +48,12 @@ RUN apk add --update --no-cache --virtual .docker-php-global-dependancies \
     libzip-dev \
     git \
     patch
-# PHP extensions
+# configure php extensions
+RUN docker-php-ext-configure soap && \
+    docker-php-ext-configure opcache --enable-opcache && \
+    docker-php-ext-configure zip --enable-zip --with-libzip && \
+    docker-php-ext-configure intl --enable-intl
+# install php extensions
 RUN docker-php-ext-install \
     bcmath \
     curl \
@@ -57,9 +66,18 @@ RUN docker-php-ext-install \
     pdo_mysql \
     pdo_pgsql \
     pdo_sqlite \
+    soap \
     tokenizer \
     xml \
     zip
+# Enable Redis
+RUN if [ "${DOCKER_PHP_ENABLE_REDIS}" != "off" ]; then \
+      pecl install redis && \
+      docker-php-ext-enable redis && \
+      php -m; \
+    else \
+      echo "Skip redis support"; \
+    fi
 # Enable imagick
 RUN if [ "${DOCKER_PHP_ENABLE_IMAGICK}" != "off" ]; then \
       # Dependancy for imagick \
