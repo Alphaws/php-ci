@@ -18,19 +18,24 @@ ENV COMPOSER_HOME /composer
 ENV PATH ./vendor/bin:/composer/vendor/bin:$PATH
 ENV COMPOSER_ALLOW_SUPERUSER 1
 # Install dependencies
+RUN apk update
 RUN apk add --update --no-cache --virtual .build-deps \
     $PHPIZE_DEPS \
-    icu-libs \
-    libintl \
     curl-dev \
-    libzip \
+    freetype-dev \
+    git \
+    icu-libs \
     imagemagick-dev \
+    libintl \
+    libjpeg-turbo-dev \
+    libpng-dev \
     libtool \
     libxml2-dev \
+    libxslt-dev \
+    libzip \
+    patch \
     postgresql-dev \
-    sqlite-dev \
-    git \
-    patch
+    sqlite-dev
 # Install build dependencies
 RUN apk add --update --no-cache --virtual .docker-php-global-dependancies \
     freetype-dev \
@@ -46,10 +51,15 @@ RUN apk add --update --no-cache --virtual .docker-php-global-dependancies \
     icu \
     icu-dev \
     libzip-dev \
+    libxslt \
     git \
     patch
 # configure php extensions
 RUN docker-php-ext-configure soap && \
+    docker-php-ext-configure gd \
+      --with-freetype-dir=/usr/include/ \
+      --with-jpeg-dir=/usr/include/ \
+      --with-png-dir=/usr/include/ && \
     docker-php-ext-configure opcache --enable-opcache && \
     docker-php-ext-configure zip --enable-zip --with-libzip && \
     docker-php-ext-configure intl --enable-intl
@@ -69,6 +79,7 @@ RUN docker-php-ext-install \
     soap \
     tokenizer \
     xml \
+    xsl \
     zip
 # Enable Redis
 RUN if [ "${DOCKER_PHP_ENABLE_REDIS}" != "off" ]; then \
