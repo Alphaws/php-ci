@@ -1,0 +1,3 @@
+#!/bin/bash
+docker build -t alphaws/php-ci:7.3-fpm --compress --no-cache --progress -f Images/Php/7.3/Fpm/
+

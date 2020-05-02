@@ -77,6 +77,7 @@ RUN docker-php-ext-install \
     pdo_pgsql \
     pdo_sqlite \
     soap \
+    sockets \
     tokenizer \
     xml \
     xsl \

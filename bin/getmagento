@@ -1,0 +1,12 @@
+#!/bin/bash -e
+# # #
+# www.magentocommerce.com/products/downloads/file/[FILENAME]
+#
+# www.magentocommerce.com/products/downloads/info/[OPTION]/[PARAMS]
+#
+# # # # # # # #
+
+echo ${M_ID}
+echo ${M_TOKEN}
+curl -k https://${M_ID}:${M_TOKEN}@www.magentocommerce.com/products/downloads/info/help
+curl -k https://${M_ID}:${M_TOKEN}@www.magentocommerce.com/products/downloads/info/files
