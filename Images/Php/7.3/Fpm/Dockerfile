@@ -3,14 +3,10 @@ MAINTAINER Imre Szeness <imre@prstart.co.uk>
 # Build options
 ARG DOCKER_PHP_ENABLE_IMAGICK
 ARG DOCKER_PHP_ENABLE_XDEBUG
-ARG DOCKER_PHP_ENABLE_REDIS
 # Info
-RUN echo -n "Php Docker image:" && \
-    echo -n "With xdebug support:        " ; if [[ "${DOCKER_PHP_ENABLE_XDEBUG}" = "on" ]] ;      then echo "Yes"; else echo "No" ; fi && \
-    echo -n "With imagick support:       " ; if [[ "${DOCKER_PHP_ENABLE_IMAGICK}" = "on" ]] ;      then echo "Yes"; else echo "No" ; fi && \
-    echo -n "With redis support:         " ; if [[ "${DOCKER_PHP_ENABLE_REDIS}" = "on" ]] ;    then echo "Yes"; else echo "No" ; fi && \
-    if [ -z ${DOCKER_USER_UID+x} ]; then echo "DOCKER_USER_UID is unset"; DOCKER_USER_UID=1000; else echo "DOCKER_USER_UID is set to '$DOCKER_USER_UID'"; fi && \
-    if [ -z ${DOCKER_USER_GID+x} ]; then echo "DOCKER_USER_GID is unset"; DOCKER_USER_GID=1000; else echo "DOCKER_USER_GID is set to '$DOCKER_USER_GID'"; fi
+RUN echo -n "Php Docker image: " && \
+    echo -n "With xdebug support:  " ; if [[ "${DOCKER_PHP_ENABLE_XDEBUG}" = "on" ]] ;      then echo "Yes"; else echo "No" ; fi && \
+    echo -n "With imagick support: " ; if [[ "${DOCKER_PHP_ENABLE_IMAGICK}" = "on" ]] ;      then echo "Yes"; else echo "No" ; fi && \
 # Composer
 ENV COMPOSER_HOME /composer
 ENV PATH ./vendor/bin:/composer/vendor/bin:$PATH
@@ -81,13 +77,9 @@ RUN docker-php-ext-install \
     xsl \
     zip
 # Enable Redis
-RUN if [ "${DOCKER_PHP_ENABLE_REDIS}" != "off" ]; then \
-      pecl install redis && \
-      docker-php-ext-enable redis && \
-      php -m; \
-    else \
-      echo "Skip redis support"; \
-    fi
+RUN pecl install -o -f redis && \
+    docker-php-ext-enable redis && \
+    php -m
 # Enable imagick
 RUN if [ "${DOCKER_PHP_ENABLE_IMAGICK}" != "off" ]; then \
       # Dependancy for imagick \
