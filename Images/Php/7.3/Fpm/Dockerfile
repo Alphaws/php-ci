@@ -1,8 +1,6 @@
 FROM php:7.3-fpm-alpine
 MAINTAINER Imre Szeness <imre@prstart.co.uk>
 # Build options
-ARG DOCKER_USER_UID=false
-ARG DOCKER_USER_GID=false
 ARG DOCKER_PHP_ENABLE_IMAGICK
 ARG DOCKER_PHP_ENABLE_XDEBUG
 ARG DOCKER_PHP_ENABLE_REDIS
@@ -132,13 +130,12 @@ RUN apk del .docker-php-global-dependancies \
   && rm -rf /var/cache/apk/* \
   && docker-php-source delete
 # set user
-RUN if [ "${DOCKER_USER_GID}" != "false" ] && [ "${DOCKER_USER_UID}" != "false" ]; then \
-      addgroup -g ${DOCKER_USER_GID} php-cli && \
-      adduser -D -u ${DOCKER_USER_UID} -G php-cli php-cli; \
-    else \
-      echo "No user for php-cli"; \
-    fi
+RUN addgroup -g 1000 app \
+      && adduser -D -u 1000 -G app app \
+      && mkdir -p /var/www/html /sock \
+      && chown -R app:app /var/www /sock
 # other
+USER app:app
 WORKDIR /var/www/html
 VOLUME /var/www
 EXPOSE 9000
