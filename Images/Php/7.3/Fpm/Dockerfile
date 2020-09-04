@@ -61,6 +61,7 @@ RUN docker-php-ext-configure soap && \
 RUN docker-php-ext-install \
     bcmath \
     curl \
+    exif \
     gd \
     iconv \
     intl \
